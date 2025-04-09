@@ -1,0 +1,210 @@
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+// Fullständig frågebank
+const allQuestions = [
+  {
+    question: "Vad är ett grundämne?",
+    options: [
+      "En blandning av flera olika ämnen",
+      "Ett ämne som bara består av en sorts atomer",
+      "Ett ämne som kan delas upp i flera ämnen",
+      "Ett ämne med både metaller och icke-metaller",
+    ],
+    correctAnswer: 1,
+    explanation: "Ett grundämne består bara av en sorts atomer."
+  },
+  {
+    question: "Vilket pH-värde har rent vatten?",
+    options: ["1", "7", "10", "14"],
+    correctAnswer: 1,
+    explanation: "Rent vatten är neutralt och har pH 7."
+  },
+  {
+    question: "Vilken partikel har negativ laddning?",
+    options: ["Proton", "Neutron", "Elektron", "Atomkärna"],
+    correctAnswer: 2,
+    explanation: "Elektroner har negativ laddning."
+  },
+  {
+    question: "Vad bildas vid en fullständig förbränning av kol?",
+    options: ["Koloxid", "Koldioxid", "Kolväte", "Rent kol"],
+    correctAnswer: 1,
+    explanation: "Vid fullständig förbränning av kol bildas koldioxid."
+  },
+  {
+    question: "Vilken aggregationstillstånd har vatten vid 0 °C?",
+    options: ["Gas", "Vätska", "Fast", "Plasma"],
+    correctAnswer: 2,
+    explanation: "Vid 0 °C är vatten i fast form, alltså is."
+  },
+  {
+    question: "Vilken gas behövs för att något ska brinna?",
+    options: ["Kväve", "Syre", "Koldioxid", "Väte"],
+    correctAnswer: 1,
+    explanation: "Syre behövs för att en eld ska kunna brinna."
+  },
+  {
+    question: "Vad är en kemisk reaktion?",
+    options: [
+      "När atomer förstörs",
+      "När atomer smälter",
+      "När nya ämnen bildas",
+      "När ämnen fryser"
+    ],
+    correctAnswer: 2,
+    explanation: "En kemisk reaktion innebär att nya ämnen bildas."
+  },
+  {
+    question: "Vilket ämne används ofta för att neutralisera en syra?",
+    options: ["Vatten", "Salt", "Bikarbonat", "Alkohol"],
+    correctAnswer: 2,
+    explanation: "Bikarbonat är ett basiskt ämne som kan neutralisera syror."
+  },
+  {
+    question: "Vilket ämne är en metall?",
+    options: ["Syre", "Klor", "Järn", "Väte"],
+    correctAnswer: 2,
+    explanation: "Järn är en metall."
+  },
+  {
+    question: "Vilken egenskap har baser?",
+    options: ["Smakar surt", "Har pH under 7", "Fräter och känns hala", "Är alltid fasta ämnen"],
+    correctAnswer: 2,
+    explanation: "Baser känns hala och kan vara frätande."
+  },
+  {
+    question: "Vad kallas den minsta enheten av ett grundämne?",
+    options: ["Molekyl", "Atom", "Jon", "Cell"],
+    correctAnswer: 1,
+    explanation: "Atomen är den minsta enheten av ett grundämne."
+  }
+];
+
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+export default function KemiQuizApp() {
+  const [totalQuestions, setTotalQuestions] = useState(8);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [quizStarted, setQuizStarted] = useState(false);
+
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showResult, setShowResult] = useState(false);
+  const [score, setScore] = useState(0);
+
+  const startQuiz = () => {
+    const number = Math.min(parseInt(totalQuestions), allQuestions.length);
+    setQuizQuestions(shuffleArray(allQuestions).slice(0, number));
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setScore(0);
+    setQuizStarted(true);
+  };
+
+  const handleAnswer = (index) => {
+    setSelectedAnswer(index);
+    setShowResult(true);
+    if (index === quizQuestions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
+  };
+
+  const nextQuestion = () => {
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setCurrentQuestion(currentQuestion + 1);
+  };
+
+  const restartQuiz = () => {
+    setQuizStarted(false);
+  };
+
+  if (!quizStarted) {
+    return (
+      <Card className="max-w-xl mx-auto mt-10 text-center p-6">
+        <h2 className="text-2xl font-bold mb-4">Starta quizet</h2>
+        <label className="block mb-2">Hur många frågor vill du ha?</label>
+        <Input
+          type="number"
+          min="1"
+          max={allQuestions.length}
+          value={totalQuestions}
+          onChange={(e) => setTotalQuestions(e.target.value)}
+          className="mb-4"
+        />
+        <Button onClick={startQuiz}>Starta</Button>
+      </Card>
+    );
+  }
+
+  if (currentQuestion >= quizQuestions.length) {
+    return (
+      <Card className="max-w-xl mx-auto mt-10 text-center p-6">
+        <h2 className="text-2xl font-bold mb-4">
+          Ditt resultat: {score}/{quizQuestions.length}
+        </h2>
+        <Button onClick={restartQuiz}>Starta om quizet</Button>
+      </Card>
+    );
+  }
+
+  const question = quizQuestions[currentQuestion];
+
+  return (
+    <Card className="max-w-xl mx-auto mt-10">
+      <CardContent className="p-6">
+        <h2 className="text-xl font-semibold mb-4">
+          Fråga {currentQuestion + 1} av {quizQuestions.length}
+        </h2>
+        <p className="mb-4">{question.question}</p>
+
+        <div className="space-y-2">
+          {question.options.map((option, index) => (
+            <Button
+              key={index}
+              variant="outline"
+              className={`w-full text-left ${
+                showResult && index === question.correctAnswer
+                  ? 'bg-green-200'
+                  : showResult && index === selectedAnswer && index !== question.correctAnswer
+                  ? 'bg-red-200'
+                  : ''
+              }`}
+              onClick={() => handleAnswer(index)}
+              disabled={showResult}
+            >
+              {option}
+            </Button>
+          ))}
+        </div>
+
+        {showResult && (
+          <div className="mt-4">
+            <p>
+              {selectedAnswer === question.correctAnswer
+                ? "Rätt svar! ✅"
+                : "Fel svar ❌"}
+            </p>
+            <p className="text-sm text-gray-600 mt-1">
+              Förklaring: {question.explanation}
+            </p>
+            <Button className="mt-4" onClick={nextQuestion}>
+              Nästa fråga
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
