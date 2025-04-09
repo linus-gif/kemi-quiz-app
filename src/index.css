@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import KemiQuizApp from './KemiQuizApp';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <KemiQuizApp />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
